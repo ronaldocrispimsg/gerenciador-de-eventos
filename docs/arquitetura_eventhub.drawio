@@ -1,0 +1,76 @@
+<mxfile host="app.diagrams.net" modified="2026-11-15T03:20:00.000Z" agent="Antigravity" version="24.0.0" type="device">
+  <diagram id="eventhub-arch" name="EventHub - Arquitetura Hibrida">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="EventHub - Arquitetura Hibrida (SOA + Microsservicos)" style="text;html=1;fontSize=20;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="250" y="20" width="660" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="client" value="Cliente&#xa;(Admin, Organizador, Participante)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#334155;strokeWidth=2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="90" width="220" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="gateway" value="API Gateway (:5000)&#xa;Flask: Roteamento + Validacao JWT + X-Correlation-ID" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;fontColor=#ffffff;strokeColor=#0f172a;strokeWidth=2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="450" y="85" width="330" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e_c_g" value="HTTP / REST JSON" style="endArrow=classic;html=1;strokeWidth=2;" edge="1" parent="1" source="client" target="gateway">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Camada SOA -->
+        <mxCell id="soa_box" value="CAMADA SOA (Servicos Corporativos Reutilizaveis - Contratos OpenAPI 3.0.3)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#2563eb;strokeWidth=2;dashed=1;verticalAlign=top;fontStyle=1;fontColor=#1d4ed8;" vertex="1" parent="1">
+          <mxGeometry x="80" y="220" width="1000" height="190" as="geometry" />
+        </mxCell>
+
+        <mxCell id="soa_id" value="soa-identidade (:5001)&#xa;Login, JWT HS256, RBAC&#xa;BD: identidade.db" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2563eb;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="120" y="270" width="270" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="soa_notif" value="soa-notificacao (:5002)&#xa;Envio de E-mail / Log Auditoria&#xa;BD: notificacoes.db" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2563eb;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="445" y="270" width="270" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="soa_orq" value="soa-orquestrador (:5003)&#xa;Inscrever -&gt; Notificar -&gt; Confirmar&#xa;Certificados e Relatorios Gerais" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#2563eb;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="770" y="270" width="270" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e_g_soa" value="" style="endArrow=classic;html=1;strokeWidth=2;" edge="1" parent="1" source="gateway" target="soa_box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Camada Microsservicos -->
+        <mxCell id="ms_box" value="MICROSSERVICOS DE DOMINIO (Independentes - Database-per-Service)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ecfdf5;strokeColor=#059669;strokeWidth=2;dashed=1;verticalAlign=top;fontStyle=1;fontColor=#047857;" vertex="1" parent="1">
+          <mxGeometry x="80" y="460" width="1000" height="230" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ms_evt" value="ms-eventos (:5004)&#xa;Catalogo, Edicao, Aprovacao" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#059669;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="120" y="510" width="270" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="db_evt" value="eventos.db" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#d1fae5;strokeColor=#059669;" vertex="1" parent="1">
+          <mxGeometry x="210" y="610" width="90" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ms_ins" value="ms-inscricoes (:5005)&#xa;Vagas, Cancelamento, Presenca" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#059669;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="445" y="510" width="270" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="db_ins" value="inscricoes.db" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#d1fae5;strokeColor=#059669;" vertex="1" parent="1">
+          <mxGeometry x="535" y="610" width="90" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ms_cert" value="ms-certificados (:5006)&#xa;Emissao e Validacao Publica" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#059669;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="770" y="510" width="270" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="db_cert" value="certificados.db" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#d1fae5;strokeColor=#059669;" vertex="1" parent="1">
+          <mxGeometry x="860" y="610" width="90" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e_soa_ms" value="" style="endArrow=classic;html=1;strokeWidth=2;" edge="1" parent="1" source="soa_box" target="ms_box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
