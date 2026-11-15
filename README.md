@@ -8,7 +8,7 @@ Sistema distribuído desenvolvido em **Python + Flask** aplicando uma **Arquitet
 
 ## Estrutura Arquitetural (7 Serviços Independentes)
 
-1. **`api-gateway` (`:5000`)**: Ponto de entrada único, validação preliminar de JWT e roteamento REST.
+1. **`api-gateway` (`:5000`)**: Ponto de entrada único, validação preliminar de JWT, roteamento REST e interface web (`http://127.0.0.1:5000/`).
 2. **Camada SOA (Contratos OpenAPI 3.0.3 em `/openapi.json` e `/apidocs`):**
    - `soa-identidade` (`:5001`, `identidade.db`): Login, emissão/validação JWT e administração de usuários.
    - `soa-notificacao` (`:5002`, `notificacoes.db`): Envio e auditoria de notificações reutilizável por outros sistemas.
@@ -36,7 +36,12 @@ pip install -r requirements.txt
 python scripts/run_all.py
 ```
 
-### 3. Executar Testes Automatizados (`pytest`)
+### 3. Acessar o Portal Web e Documentação OpenAPI
+Com os serviços em execução (via Docker Compose ou `scripts/run_all.py`):
+- **Portal Web EventHub (Frontend RBAC):** `http://127.0.0.1:5000/`
+- **Swagger UI (`api-gateway`):** `http://127.0.0.1:5000/apidocs`
+
+### 4. Executar Testes Automatizados (`pytest`)
 ```bash
 .venv/bin/python -m pytest -v
 ```

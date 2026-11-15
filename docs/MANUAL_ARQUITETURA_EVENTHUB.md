@@ -29,7 +29,7 @@ O sistema suporta no mínimo três perfis bem definidos com controle de acesso v
 
 | Serviço | Camada | Porta | Justificativa Arquitetural |
 | :--- | :---: | :---: | :--- |
-| **`api-gateway`** | Entrada (Borda) | `5000` | Ponto único de entrada (*Single Entry Point*), responsável por validação preliminar de assinatura JWT, geração/propagação de `X-Correlation-ID` e roteamento HTTP para as camadas internas. |
+| **`api-gateway`** | Entrada (Borda) | `5000` | Ponto único de entrada (*Single Entry Point*), responsável por validação preliminar de assinatura JWT, geração/propagação de `X-Correlation-ID`, roteamento HTTP para as camadas internas e entrega do portal web SPA (`GET /`, `/static/*`). |
 | **`soa-identidade`** | **SOA** | `5001` | Serviço corporativo reutilizável por qualquer sistema universitário (Biblioteca, Portal do Aluno, EventHub) para emissão/validação de JWT e gestão centralizada de identidades com contrato formal OpenAPI 3.0.3. |
 | **`soa-notificacao`** | **SOA** | `5002` | Serviço corporativo genérico de mensageria/auditoria de avisos (e-mail, SMS, sistema) parametrizado por `sistema_origem`, permitindo reuso institucional desacoplado. |
 | **`soa-orquestrador`** | **SOA** | `5003` | Implementa o padrão clássico SOA de **orquestração de processos de negócio compostos** (inscrição, cancelamento, emissão de certificado e agregação de relatórios), evitando que clientes tenham de coordenar múltiplos serviços manualmente. |
