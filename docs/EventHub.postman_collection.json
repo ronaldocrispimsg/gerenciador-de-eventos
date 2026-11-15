@@ -1,0 +1,246 @@
+{
+  "info": {
+    "name": "EventHub - Arquitetura Hibrida (SOA + Microsservicos)",
+    "description": "Colecao completa organizada por perfil (Admin, Organizador, Participante) e contratos OpenAPI.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://127.0.0.1:5000" },
+    { "key": "token_admin", "value": "" },
+    { "key": "token_org", "value": "" },
+    { "key": "token_part", "value": "" },
+    { "key": "evento_id", "value": "1" },
+    { "key": "inscricao_id", "value": "1" },
+    { "key": "codigo_certificado", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Autenticacao e Contratos OpenAPI",
+      "item": [
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@universidade.edu.br\",\n  \"senha\": \"Admin@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login Organizador",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"organizador@universidade.edu.br\",\n  \"senha\": \"Org@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login Participante",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"participante@universidade.edu.br\",\n  \"senha\": \"Part@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Registrar Participante",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Maria Discente\",\n  \"email\": \"maria@universidade.edu.br\",\n  \"senha\": \"Maria@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "OpenAPI Identidade (SOA)",
+          "request": { "method": "GET", "url": "http://127.0.0.1:5001/openapi.json" }
+        },
+        {
+          "name": "OpenAPI Notificacao (SOA)",
+          "request": { "method": "GET", "url": "http://127.0.0.1:5002/openapi.json" }
+        },
+        {
+          "name": "OpenAPI Orquestrador (SOA)",
+          "request": { "method": "GET", "url": "http://127.0.0.1:5003/openapi.json" }
+        }
+      ]
+    },
+    {
+      "name": "2. Perfil Administrador (admin)",
+      "item": [
+        {
+          "name": "Listar Usuarios",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_admin}}" }],
+            "url": "{{base_url}}/usuarios"
+          }
+        },
+        {
+          "name": "Criar Usuario Organizador",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/usuarios",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Prof. Carlos\",\n  \"email\": \"carlos.org@universidade.edu.br\",\n  \"senha\": \"Carlos@123\",\n  \"role\": \"organizador\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Aprovar Evento",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/eventos/{{evento_id}}/aprovar",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"APROVADO\"\n}" }
+          }
+        },
+        {
+          "name": "Consultar Relatorio Geral",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_admin}}" }],
+            "url": "{{base_url}}/relatorios/geral"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Perfil Organizador (organizador)",
+      "item": [
+        {
+          "name": "Criar Evento",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_org}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/eventos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Minicurso de Sistemas Distribuidos\",\n  \"descricao\": \"Pratica de SOA e Microsservicos\",\n  \"tipo\": \"MINICURSO\",\n  \"data_evento\": \"2026-11-28\",\n  \"local\": \"Laboratorio 03\",\n  \"capacidade\": 40,\n  \"carga_horaria\": 8\n}"
+            }
+          }
+        },
+        {
+          "name": "Editar Evento",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_org}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/eventos/{{evento_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"local\": \"Auditorio Principal\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar Inscritos no Evento",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_org}}" }],
+            "url": "{{base_url}}/eventos/{{evento_id}}/inscritos"
+          }
+        },
+        {
+          "name": "Registrar Presenca do Inscrito",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_org}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/inscricoes/{{inscricao_id}}/presenca",
+            "body": { "mode": "raw", "raw": "{\n  \"presenca\": true\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Perfil Participante (participante)",
+      "item": [
+        {
+          "name": "Consultar Eventos Aprovados",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_part}}" }],
+            "url": "{{base_url}}/eventos"
+          }
+        },
+        {
+          "name": "Inscrever-se (Fluxo Orquestrado)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_part}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/inscricoes",
+            "body": { "mode": "raw", "raw": "{\n  \"evento_id\": {{evento_id}}\n}" }
+          }
+        },
+        {
+          "name": "Minhas Inscricoes",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_part}}" }],
+            "url": "{{base_url}}/inscricoes/minhas"
+          }
+        },
+        {
+          "name": "Emitir Certificado (Fluxo Orquestrado)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_part}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{base_url}}/certificados/emitir",
+            "body": { "mode": "raw", "raw": "{\n  \"inscricao_id\": {{inscricao_id}}\n}" }
+          }
+        },
+        {
+          "name": "Validar Certificado (Publico)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/certificados/validar/{{codigo_certificado}}"
+          }
+        },
+        {
+          "name": "Cancelar Inscricao (Fluxo Orquestrado)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_part}}" }],
+            "url": "{{base_url}}/inscricoes/{{inscricao_id}}/cancelar"
+          }
+        }
+      ]
+    }
+  ]
+}

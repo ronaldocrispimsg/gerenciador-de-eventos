@@ -1,0 +1,37 @@
+# Governanca privada e historico de chat
+.agents/
+
+# Ambientes virtuais e cache Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Bancos de dados locais e runtime
+*.db
+*.sqlite
+*.sqlite3
+instance/
+data/
+
+# Segredos e ambiente
+.env
+.env.local
+
+# Documentos compilados / material de terceiros e metadados Windows/WSL
+*.pdf
+*:Zone.Identifier
+*.aux
+*.bbl
+*.blg
+*.brf
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fdb_latexmk
+*.fls

@@ -1,0 +1,129 @@
+services:
+  soa-identidade:
+    build: .
+    container_name: eventhub-soa-identidade
+    command: python -m services.soa_identidade.app
+    environment:
+      - IDENTIDADE_PORT=5001
+      - IDENTIDADE_DB_PATH=/app/data/identidade.db
+      - JWT_SECRET=${JWT_SECRET:-eventhub-dev-secret-alterar-em-producao}
+    ports:
+      - "5001:5001"
+    volumes:
+      - identidade_data:/app/data
+    networks:
+      - eventhub-net
+
+  soa-notificacao:
+    build: .
+    container_name: eventhub-soa-notificacao
+    command: python -m services.soa_notificacao.app
+    environment:
+      - NOTIFICACAO_PORT=5002
+      - NOTIFICACAO_DB_PATH=/app/data/notificacoes.db
+      - JWT_SECRET=${JWT_SECRET:-eventhub-dev-secret-alterar-em-producao}
+    ports:
+      - "5002:5002"
+    volumes:
+      - notificacao_data:/app/data
+    networks:
+      - eventhub-net
+
+  ms-eventos:
+    build: .
+    container_name: eventhub-ms-eventos
+    command: python -m services.ms_eventos.app
+    environment:
+      - EVENTOS_PORT=5004
+      - EVENTOS_DB_PATH=/app/data/eventos.db
+      - JWT_SECRET=${JWT_SECRET:-eventhub-dev-secret-alterar-em-producao}
+    ports:
+      - "5004:5004"
+    volumes:
+      - eventos_data:/app/data
+    networks:
+      - eventhub-net
+
+  ms-inscricoes:
+    build: .
+    container_name: eventhub-ms-inscricoes
+    command: python -m services.ms_inscricoes.app
+    environment:
+      - INSCRICOES_PORT=5005
+      - INSCRICOES_DB_PATH=/app/data/inscricoes.db
+      - JWT_SECRET=${JWT_SECRET:-eventhub-dev-secret-alterar-em-producao}
+    ports:
+      - "5005:5005"
+    volumes:
+      - inscricoes_data:/app/data
+    networks:
+      - eventhub-net
+
+  ms-certificados:
+    build: .
+    container_name: eventhub-ms-certificados
+    command: python -m services.ms_certificados.app
+    environment:
+      - CERTIFICADOS_PORT=5006
+      - CERTIFICADOS_DB_PATH=/app/data/certificados.db
+      - JWT_SECRET=${JWT_SECRET:-eventhub-dev-secret-alterar-em-producao}
+    ports:
+      - "5006:5006"
+    volumes:
+      - certificados_data:/app/data
+    networks:
+      - eventhub-net
+
+  soa-orquestrador:
+    build: .
+    container_name: eventhub-soa-orquestrador
+    command: python -m services.soa_orquestrador.app
+    environment:
+      - ORQUESTRADOR_PORT=5003
+      - JWT_SECRET=${JWT_SECRET:-eventhub-dev-secret-alterar-em-producao}
+      - IDENTIDADE_URL=http://soa-identidade:5001
+      - NOTIFICACAO_URL=http://soa-notificacao:5002
+      - EVENTOS_URL=http://ms-eventos:5004
+      - INSCRICOES_URL=http://ms-inscricoes:5005
+      - CERTIFICADOS_URL=http://ms-certificados:5006
+    ports:
+      - "5003:5003"
+    depends_on:
+      - soa-identidade
+      - soa-notificacao
+      - ms-eventos
+      - ms-inscricoes
+      - ms-certificados
+    networks:
+      - eventhub-net
+
+  api-gateway:
+    build: .
+    container_name: eventhub-api-gateway
+    command: python -m services.api_gateway.app
+    environment:
+      - GATEWAY_PORT=5000
+      - JWT_SECRET=${JWT_SECRET:-eventhub-dev-secret-alterar-em-producao}
+      - IDENTIDADE_URL=http://soa-identidade:5001
+      - NOTIFICACAO_URL=http://soa-notificacao:5002
+      - ORQUESTRADOR_URL=http://soa-orquestrador:5003
+      - EVENTOS_URL=http://ms-eventos:5004
+      - INSCRICOES_URL=http://ms-inscricoes:5005
+      - CERTIFICADOS_URL=http://ms-certificados:5006
+    ports:
+      - "5000:5000"
+    depends_on:
+      - soa-orquestrador
+    networks:
+      - eventhub-net
+
+volumes:
+  identidade_data:
+  notificacao_data:
+  eventos_data:
+  inscricoes_data:
+  certificados_data:
+
+networks:
+  eventhub-net:
+    driver: bridge
