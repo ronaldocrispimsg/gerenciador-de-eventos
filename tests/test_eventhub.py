@@ -407,3 +407,25 @@ def test_database_isolation_per_service(cluster) -> None:
         finally:
             conn.close()
         assert found == tables
+
+
+def test_frontend_assets_served(cluster) -> None:
+    """Garante que o portal web SPA e seus assets estaticos sao servidos pelo API Gateway."""
+    gw = cluster["gateway"]
+
+    r_index = requests.get(f"{gw}/", timeout=5)
+    assert r_index.status_code == 200
+    assert "text/html" in r_index.headers.get("Content-Type", "")
+    assert "no-store" in r_index.headers.get("Cache-Control", "")
+    assert "EventHub" in r_index.text
+    assert 'src="/static/app.js"' in r_index.text
+
+    r_css = requests.get(f"{gw}/static/styles.css", timeout=5)
+    assert r_css.status_code == 200
+    assert "text/css" in r_css.headers.get("Content-Type", "")
+
+    r_js = requests.get(f"{gw}/static/app.js", timeout=5)
+    assert r_js.status_code == 200
+    assert "javascript" in r_js.headers.get("Content-Type", "")
+    assert "/auth/login" in r_js.text
+

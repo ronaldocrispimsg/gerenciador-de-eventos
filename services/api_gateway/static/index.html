@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EventHub — Gestão de Eventos Universitários</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230F172A'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='%23FFFFFF' font-family='sans-serif' font-size='16' font-weight='bold'%3EE%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Tela inicial (Login, Cadastro e Validacao Publica de Certificados) -->
+  <div id="auth-screen" class="auth-shell">
+    <header class="auth-topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">EH</span>
+        <div>
+          <strong>EventHub</strong>
+          <span class="brand-sub">Portal Acadêmico de Eventos</span>
+        </div>
+      </div>
+      <nav class="topbar-links" aria-label="Documentação das APIs">
+        <a href="/apidocs" target="_blank" rel="noopener">Swagger Gateway</a>
+      </nav>
+    </header>
+
+    <main class="auth-grid">
+      <section class="auth-intro">
+        <h1>Semanas acadêmicas, palestras e minicursos em um único portal</h1>
+        <p class="lead">
+          Gerencie propostas de eventos, acompanhe inscrições com confirmação imediata,
+          registre presença e emita certificados verificáveis pela instituição.
+        </p>
+
+        <div class="public-validator">
+          <h2>Validar certificado</h2>
+          <p class="muted">
+            Qualquer pessoa pode confirmar a autenticidade de um certificado informando o código impresso no documento.
+          </p>
+          <form id="public-validate-form" class="inline-form">
+            <label for="public-cert-code" class="sr-only">Código verificador do certificado</label>
+            <input
+              id="public-cert-code"
+              name="codigo"
+              type="text"
+              placeholder="Ex.: EVTHUB-2026-A1B2C3D4"
+              autocomplete="off"
+              required
+            />
+            <button type="submit" class="btn btn-secondary">Verificar autenticidade</button>
+          </form>
+          <div id="public-validate-result" class="validate-result hidden" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="auth-panel" aria-label="Acesso ao sistema">
+        <div class="tab-switch" role="tablist" aria-label="Modo de acesso">
+          <button
+            type="button"
+            role="tab"
+            id="tab-login"
+            aria-selected="true"
+            class="tab-btn active"
+            data-auth-tab="login"
+          >Entrar</button>
+          <button
+            type="button"
+            role="tab"
+            id="tab-register"
+            aria-selected="false"
+            class="tab-btn"
+            data-auth-tab="register"
+          >Criar conta</button>
+        </div>
+
+        <form id="login-form" class="stack-form">
+          <div class="field">
+            <label for="login-email">E-mail institucional</label>
+            <input id="login-email" name="email" type="email" autocomplete="email" required />
+          </div>
+          <div class="field">
+            <label for="login-password">Senha</label>
+            <input id="login-password" name="senha" type="password" autocomplete="current-password" required />
+          </div>
+          <div id="login-error" class="form-error hidden" role="alert"></div>
+          <button type="submit" class="btn btn-primary btn-full">Entrar no portal</button>
+
+          <div class="demo-accounts">
+            <p class="demo-title">Contas de demonstração (ambiente local)</p>
+            <div class="demo-buttons">
+              <button type="button" class="btn-chip" data-fill-role="participante">Participante</button>
+              <button type="button" class="btn-chip" data-fill-role="organizador">Organizador</button>
+              <button type="button" class="btn-chip" data-fill-role="admin">Administrador</button>
+            </div>
+          </div>
+        </form>
+
+        <form id="register-form" class="stack-form hidden">
+          <div class="field">
+            <label for="reg-name">Nome completo</label>
+            <input id="reg-name" name="nome" type="text" autocomplete="name" required />
+          </div>
+          <div class="field">
+            <label for="reg-email">E-mail</label>
+            <input id="reg-email" name="email" type="email" autocomplete="email" required />
+          </div>
+          <div class="field">
+            <label for="reg-password">Senha (mínimo 6 caracteres)</label>
+            <input id="reg-password" name="senha" type="password" minlength="6" autocomplete="new-password" required />
+          </div>
+          <div id="register-error" class="form-error hidden" role="alert"></div>
+          <button type="submit" class="btn btn-primary btn-full">Cadastrar como participante</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <!-- Workspace autenticado -->
+  <div id="app-screen" class="app-shell hidden">
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">EH</span>
+        <div>
+          <strong>EventHub</strong>
+          <span class="brand-sub">Sistema Universitário de Eventos</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="user-pill">
+          <span id="user-name" class="user-name"></span>
+          <span id="user-role" class="role-badge"></span>
+        </div>
+        <button id="refresh-view-btn" type="button" class="btn btn-ghost">Atualizar</button>
+        <button id="logout-btn" type="button" class="btn btn-secondary">Sair</button>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <aside class="sidebar" aria-label="Navegação principal">
+        <nav id="sidebar-nav" class="nav-list"></nav>
+      </aside>
+
+      <main id="main-content" class="main-content" tabindex="-1"></main>
+    </div>
+  </div>
+
+  <!-- Modal reutilizavel -->
+  <dialog id="app-modal" class="modal">
+    <div class="modal-header">
+      <h2 id="modal-title"></h2>
+      <button id="modal-close-btn" type="button" class="btn-icon" aria-label="Fechar janela">&times;</button>
+    </div>
+    <div id="modal-body" class="modal-body"></div>
+  </dialog>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -9,13 +9,19 @@ O **EventHub** implementa uma **Arquitetura Híbrida (SOA + Microsserviços)** e
 
 | Camada | Serviço | Porta | Banco SQLite Próprio | Responsabilidade |
 | :--- | :--- | :---: | :--- | :--- |
-| Entrada | `api-gateway` | `5000` | — | Validação preliminar de JWT, `X-Correlation-ID` e roteamento |
+| Entrada / UI | `api-gateway` | `5000` | — | Validação preliminar de JWT, `X-Correlation-ID`, roteamento REST e entrega do portal web SPA (`GET /`, `/static/*`) |
 | SOA | `soa-identidade` | `5001` | `data/identidade.db` | Autenticação, emissão/validação JWT e gestão de usuários |
 | SOA | `soa-notificacao` | `5002` | `data/notificacoes.db` | Serviço corporativo reutilizável de e-mail/log |
 | SOA | `soa-orquestrador` | `5003` | — | Orquestração (inscrição, cancelamento, certificado, relatórios) |
 | Microsserviço | `ms-eventos` | `5004` | `data/eventos.db` | Criação, edição e aprovação de eventos |
 | Microsserviço | `ms-inscricoes` | `5005` | `data/inscricoes.db` | Gestão de inscrições, vagas, cancelamentos e presença |
 | Microsserviço | `ms-certificados` | `5006` | `data/certificados.db` | Emissão de certificados e validação pública por código |
+
+## Interface Web (`services/api_gateway/static/`)
+SPA estática servida diretamente pelo `api-gateway` na mesma origem (`http://127.0.0.1:5000/`), sem build Node nem CORS:
+- `index.html`: tela de autenticação/auto-cadastro com preenchimento rápido das contas demo e validador público de certificados + shell autenticado RBAC.
+- `styles.css`: layout responsivo com tokens CSS, foco visível e suporte a `prefers-reduced-motion`.
+- `app.js`: cliente `fetch` com token em `sessionStorage`, criação segura de DOM via `textContent` e visões separadas por perfil (`participante`, `organizador`, `admin`).
 
 ## Infraestrutura Compartilhada (`common/`)
 Contém apenas utilitários transversais sem compartilhamento de banco:
