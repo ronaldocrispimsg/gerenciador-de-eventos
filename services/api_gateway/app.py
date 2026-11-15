@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from typing import Any
 
 import jwt
-from flask import Flask, jsonify, request
+from flask import Flask, Response, jsonify, request, send_from_directory
 
 from common.auth import decode_token, extract_bearer_token
 from common.http_client import get_correlation_id, service_request
@@ -38,11 +39,24 @@ def _default_urls() -> dict[str, str]:
     }
 
 
+STATIC_DIR = Path(__file__).resolve().parent / "static"
+
+
 def create_app(service_urls: dict[str, str] | None = None) -> Flask:
     """Cria e configura o aplicativo Flask do API Gateway."""
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder=str(STATIC_DIR), static_url_path="/static")
     urls = {**_default_urls(), **(service_urls or {})}
     app.config["SERVICE_URLS"] = urls
+
+    @app.after_request
+    def _no_cache_frontend(response: Response) -> Response:
+        if request.path == "/" or request.path.startswith("/static/"):
+            response.headers["Cache-Control"] = "no-store"
+        return response
+
+    @app.get("/")
+    def serve_frontend() -> Response:
+        return send_from_directory(STATIC_DIR, "index.html")
 
     spec = build_openapi_spec(
         title="EventHub - API Gateway",
